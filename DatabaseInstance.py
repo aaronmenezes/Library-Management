@@ -1,6 +1,7 @@
 from models.DBConnect import init_db,shutdown_session,db_session,Base 
 from models.Book import Book 
 from models.Inventory import Inventory
+from models.Member import Member
  
 class DatabaseInstance:
     __instance = None 
@@ -38,7 +39,16 @@ class DatabaseInstance:
         db_session.query(Inventory).filter(Inventory.bookID == book_id).update({'count':count})
         db_session.commit()
         return []
-	
+    
+    def get_member(self,userid):
+        member = db_session.query(Member).filter_by(user_id=userid).first()
+        return member
+        
+    def add_member(self,user_id,psswd,f_name,l_name,dob,joindate):
+        db_session.add(Member(user_id=user_id,psswd=psswd,first_name = f_name,last_name= l_name,dob= dob,join_date= joindate))
+        db_session.commit()
+        return ""
+        
     def book_checkout(self,book_id,member_id):
         pass
     def book_checkin(self,book_id,member_id):
