@@ -2,6 +2,7 @@ from models.DBConnect import init_db,shutdown_session,db_session,Base
 from models.Book import Book 
 from models.Inventory import Inventory
 from models.Member import Member
+from models.Bag import Bag
  
 class DatabaseInstance:
     __instance = None 
@@ -49,14 +50,23 @@ class DatabaseInstance:
         db_session.commit()
         return ""
         
-    def book_checkout(self,book_id,member_id):
-        pass
-    def book_checkin(self,book_id,member_id):
-        pass 
+    def book_checkout(self,book_id,member_id,date):
+	    #check debt         
+        inventory_item = db_session.query(Inventory).filter_by(bookID=int(member_id)).first()
+        print(inventory_item.checkout_count < inventory_item.count)
+        if inventory_item.checkout_count < inventory_item.count:
+            inventory_item.checkout_count = inventory_item.checkout_count+1
+            db_session.add(Bag(bookID = book_id,memberID=member_id,status = 1,checkout_date=date))
+            db_session.commit()
+        return []
 
-    def add_new_member():
-        pass
-        
+    def book_checkin(self,book_id,member_id,date):
+        inventory_item = db_session.query(Inventory).filter_by(bookID=int(member_id)).first()  
+        inventory_item.checkout_count = inventory_item.checkout_count-1
+        db_session.query(Bag).filter(Bag.memberID == member_id , Bag.bookID == book_id ).update({'checkin_date':date,'status':0}) 
+        db_session.commit()
+        return []
+		
     def remove(self):
         shutdown_session()
 '''

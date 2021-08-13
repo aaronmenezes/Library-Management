@@ -4,12 +4,14 @@ from DatabaseInstance import DatabaseInstance
 from datetime import datetime
 from time import sleep
 from flask_cors import CORS
+from models.Member import Member
+
 import sqlite3
 import os 
 import pandas as pd 
 import requests    
 import hashlib 
-from models.Member import Member
+
 app = Flask(__name__)   
 CORS(app)
 
@@ -68,7 +70,22 @@ def sign_up():
 	psswd = hashPass(user_id,request.json['psswd'])  
 	DatabaseInstance.getInstance().add_member(user_id,psswd,request.json['fName'],request.json['lName'],request.json['dob'],datetime.today().strftime('%Y-%m-%d'));
 	return ""
- 
+
+@app.route('/checkout' , methods=['POST'])
+def checkout():
+    user_id = request.json['userId']
+    book_id = request.json['bookId'] 
+    DatabaseInstance.getInstance().book_checkout(user_id,book_id,datetime.today().strftime('%Y-%m-%d'));
+    return ""
+
+@app.route('/checkin' , methods=['POST'])
+def checkin():
+    user_id = request.json['userId']
+    book_id = request.json['bookId'] 
+    DatabaseInstance.getInstance().book_checkin(user_id,book_id,datetime.today().strftime('%Y-%m-%d'));
+    return ""
+
+
 def hashPass(user_id,psswd):
     result = hashlib.md5((user_id+psswd).encode())
     return  result.hexdigest()
