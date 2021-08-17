@@ -34,8 +34,8 @@ class DatabaseInstance:
         return booklist    
     
     def get_checked_books(self):
-        booklist = db_session.query(Bag).outerjoin(Book,Book.bookID==Bag.bookID).all()
-        return booklist    
+        baglist = db_session.query(Bag,Book,Member).join(Book,Book.bookID==Bag.bookID).join(Member,Member.id==Bag.memberID).all()
+        return baglist   
     
     def add_items_to_inventory(self,inventory_list ):  
         for item in inventory_list: 

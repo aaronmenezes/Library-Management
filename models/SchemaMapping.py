@@ -22,7 +22,15 @@ class Inventory(Schema):
     count = fields.Int()
     checkout_count = fields.Int() 
 
-
+class Member(Schema):  
+	id = fields.Int()
+	first_name = fields.Str() 	
+	last_name = fields.Str()	
+	user_id = fields.Str()
+	psswd = fields.Str() 
+	dob = fields.Str()
+	join_date = fields.Str()
+	
 class Bag(Schema): 
     bagId = fields.Int()
     bookID = fields.Int()
@@ -30,3 +38,8 @@ class Bag(Schema):
     status = fields.Int()
     checkout_date = fields.Str() 
     checkin_date = fields.Str() 
+	
+class CheckedBooks(Schema): 
+    bag_item = fields.Nested(Bag)
+    book_item = fields.Nested(Book)
+    member_item = fields.Nested(Member,exclude={"psswd"})

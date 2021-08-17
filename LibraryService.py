@@ -7,6 +7,9 @@ from flask_cors import CORS
 from models.Member import Member
 from models.SchemaMapping import Book as BookSchema
 from models.SchemaMapping import Bag as BagSchema
+from models.SchemaMapping import CheckedBooks as CheckedBooksSchema
+from models.CheckedBooks import CheckedBooks
+
 import sqlite3
 import os 
 import pandas as pd 
@@ -96,12 +99,13 @@ def checkin():
 
 @app.route('/getCheckedBooks')
 def get_checked_books(): 
-    book_list = DatabaseInstance.getInstance().get_checked_books();
-    print(book_list)
-    schema = BagSchema()
-    result = BagSchema().dump(book_list, many=True) 
-    return jsonify({"booklist":result})
-    return ""
+    baglist = DatabaseInstance.getInstance().get_checked_books();  
+    checked_books = []
+    for bgitem,bkitem,memitem  in baglist:
+        checked_books.append(CheckedBooks(bag_item=bgitem , book_item=bkitem, member_item = memitem))
+    schema = CheckedBooksSchema()
+    result = schema.dump(checked_books,many=True) 
+    return jsonify({"booklist":result}) 
 
 
 def hashPass(user_id,psswd):
