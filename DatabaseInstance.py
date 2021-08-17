@@ -28,6 +28,14 @@ class DatabaseInstance:
             db_session.add(book)
         db_session.commit()
         return []
+        
+    def get_all_books(self):        
+        booklist = db_session.query(Book).all()
+        return booklist    
+    
+    def get_checked_books(self):
+        booklist = db_session.query(Bag).outerjoin(Book,Book.bookID==Bag.bookID).all()
+        return booklist    
     
     def add_items_to_inventory(self,inventory_list ):  
         for item in inventory_list: 
@@ -50,9 +58,9 @@ class DatabaseInstance:
         db_session.commit()
         return ""
         
-    def book_checkout(self,book_id,member_id,date):
-	    #check debt         
-        inventory_item = db_session.query(Inventory).filter_by(bookID=int(member_id)).first()
+    def book_checkout(self,member_id,book_id,date):
+        #check debt         
+        inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first()
         print(inventory_item.checkout_count < inventory_item.count)
         if inventory_item.checkout_count < inventory_item.count:
             inventory_item.checkout_count = inventory_item.checkout_count+1
@@ -61,12 +69,12 @@ class DatabaseInstance:
         return []
 
     def book_checkin(self,book_id,member_id,date):
-        inventory_item = db_session.query(Inventory).filter_by(bookID=int(member_id)).first()  
+        inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first()  
         inventory_item.checkout_count = inventory_item.checkout_count-1
         db_session.query(Bag).filter(Bag.memberID == member_id , Bag.bookID == book_id ).update({'checkin_date':date,'status':0}) 
         db_session.commit()
         return []
-		
+        
     def remove(self):
         shutdown_session()
 '''
