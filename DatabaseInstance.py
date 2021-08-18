@@ -73,7 +73,11 @@ class DatabaseInstance:
         db_session.add(Member(user_id=user_id,psswd=psswd,first_name = f_name,last_name= l_name,dob= dob,join_date= joindate))
         db_session.commit()
         return ""
-       
+        
+    def get_member_list(self):
+        member_list = db_session.query(Member).filter(Member.role == "member").all() 
+        return member_list		
+    
     def book_checkout(self,member_id,book_id,date):
         #check debt         
         inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first()

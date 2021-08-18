@@ -30,6 +30,7 @@ class Member(Schema):
     psswd = fields.Str() 
     dob = fields.Str()
     join_date = fields.Str()
+    role = fields.Str()
     
 class Bag(Schema): 
     bagId = fields.Int()

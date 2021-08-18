@@ -9,6 +9,7 @@ from models.CheckedBooks import CheckedBooks
 from models.InventoryView import InventoryView
 from models.SchemaMapping import Book as BookSchema
 from models.SchemaMapping import Bag as BagSchema
+from models.SchemaMapping import Member as MemberSchema
 from models.SchemaMapping import CheckedBooks as CheckedBooksSchema 
 from models.SchemaMapping import Inventory as InventorySchema 
 from models.SchemaMapping import InventoryView as InventoryViewSchema
@@ -130,7 +131,14 @@ def get_books_inventory():
     result = schema.dump(inventory,many=True) 
     return jsonify({"booklist":result}) 
 
-
+@app.route('/getMemberList')
+def get_member_list():
+    member_list = DatabaseInstance.getInstance().get_member_list();
+    print(member_list)
+    schema = MemberSchema(exclude={"psswd"})
+    result = schema.dump(member_list,many=True) 
+    return jsonify({"memberlist":result}) 
+	
 def hashPass(user_id,psswd):
     result = hashlib.md5((user_id+psswd).encode())
     return  result.hexdigest()
@@ -138,44 +146,6 @@ def hashPass(user_id,psswd):
 def check_password(user_id,raw_password, enc_password):    
     return enc_password == hashPass(user_id,raw_password)
 
-@app.route("/getAllNotes")
-def get_all_notes():
-    cur = DatabaseInstance.getInstance().get_all_notes()
-    return jsonify(cur)
-    
-@app.route("/getAllNotesList")
-def get_all_notes_list():
-    cur = DatabaseInstance.getInstance().get_all_notes_list()
-    return jsonify(cur)
-
-@app.route("/addNewNote")
-def add_new_note():
-    print(request.args)
-    cur = DatabaseInstance.getInstance().add_new_note(request.args['name'],request.args['date'],request.args['priority'],request.args['body'])
-    return jsonify(cur)
-    
-@app.route("/updateNote")
-def update_note():
-    print(request.args)
-    cur = DatabaseInstance.getInstance().update_note(request.args['id'],request.args['name'],request.args['body'])
-    return jsonify(cur)
-
-@app.route("/updateNotePriority")
-def update_note_priority():
-    print(request.args)
-    cur = DatabaseInstance.getInstance().update_note_priority(request.args['id'],request.args['priority'])
-    return jsonify(cur)
-
-@app.route("/deleteNote")
-def delete_note():
-    print(request.args)
-    cur = DatabaseInstance.getInstance().delete_note(request.args['id'])
-    return jsonify(cur)
-    
-@app.route("/getNoteArchive")
-def get_note_archive():
-    cur = DatabaseInstance.getInstance().get_note_archive()
-    return jsonify(cur)
     
 @app.teardown_appcontext
 def shutdown_session(exception=None):

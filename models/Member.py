@@ -11,6 +11,7 @@ class Member(Base):
 	psswd = Column("m_pass" ,String(100)) 
 	dob = Column("m_dob" ,String(100))
 	join_date = Column("m_join_date" ,String(100))
+	role = Column("m_role" ,String(100))
 	
 	def __repr__(self):
 		return f'<Member {self.user_id!r}>'
