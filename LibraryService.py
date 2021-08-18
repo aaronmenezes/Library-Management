@@ -60,6 +60,16 @@ def update_book_count():
     DatabaseInstance.getInstance().update_inventory_item(request.args["bookId"],request.args["count"])
     return ""
 
+@app.route('/deleteBook')
+def delete_book(): 
+    DatabaseInstance.getInstance().delete_book(request.args["bookId"])
+    return jsonify({"status":"success"})
+
+@app.route('/updateBookDetails', methods=['POST'])
+def update_book_details():   
+    DatabaseInstance.getInstance().update_book_details(request.json["bookId"],request.json["bookDetails"])
+    return jsonify({"status":"success"})
+
 @app.route('/signin', methods=['POST'])
 def sign_in(): 
     print(request.json)

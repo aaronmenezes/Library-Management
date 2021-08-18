@@ -40,7 +40,19 @@ class DatabaseInstance:
     def get_books_inventory(self):
         inventory = db_session.query(Inventory,Book).join(Book,Book.bookID==Inventory.bookID).all()
         return inventory
-    
+
+    def delete_book(self,bookid):
+        Book.query.filter_by(bookID=bookid).delete()
+        Inventory.query.filter_by(bookID=bookid).delete()
+        Bag.query.filter_by(bookID=bookid).delete()
+        db_session.commit()
+        return []
+        
+    def update_book_details(self,bookid,book_vals):
+        db_session.query(Book).filter(Book.bookID == bookid).update(book_vals)
+        db_session.commit() 
+        return []
+
     def add_items_to_inventory(self,inventory_list ):  
         for item in inventory_list: 
             inventory = Inventory(**item) 
