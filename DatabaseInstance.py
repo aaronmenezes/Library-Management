@@ -72,7 +72,7 @@ class DatabaseInstance:
             db_session.commit()
         return []
 
-    def book_checkin(self,book_id,member_id,date):
+    def book_checkin(self,member_id,book_id,date):
         inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first()  
         inventory_item.checkout_count = inventory_item.checkout_count-1
         db_session.query(Bag).filter(Bag.memberID == member_id , Bag.bookID == book_id ).update({'checkin_date':date,'status':0}) 

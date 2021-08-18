@@ -83,22 +83,22 @@ def sign_in():
 def sign_up():
     user_id = request.json['userId']
     psswd = hashPass(user_id,request.json['psswd'])  
-    DatabaseInstance.getInstance().add_member(user_id,psswd,request.json['fName'],request.json['lName'],request.json['dob'],datetime.today().strftime('%Y-%m-%d'));
+    DatabaseInstance.getInstance().add_member(user_id,psswd,request.json['fName'],request.json['lName'],request.json['dob'],datetime.today().strftime('%d-%m-%Y'));
     return ""
 
 @app.route('/checkout' , methods=['POST'])
 def checkout():
     user_id = request.json['userId']
     book_id = request.json['bookId'] 
-    DatabaseInstance.getInstance().book_checkout(user_id,book_id,datetime.today().strftime('%Y-%m-%d'));
+    DatabaseInstance.getInstance().book_checkout(user_id,book_id,datetime.today().strftime('%d-%m-%Y'));
     return ""
 
 @app.route('/checkin' , methods=['POST'])
 def checkin():
     user_id = request.json['userId']
-    book_id = request.json['bookId'] 
-    DatabaseInstance.getInstance().book_checkin(user_id,book_id,datetime.today().strftime('%Y-%m-%d'));
-    return ""
+    book_id = request.json['bookId']  
+    DatabaseInstance.getInstance().book_checkin(user_id,book_id,datetime.today().strftime('%d-%m-%Y'));
+    return jsonify({"status":"success"})
 
 @app.route('/getCheckedBooks')
 def get_checked_books(): 
