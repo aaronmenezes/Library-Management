@@ -5,10 +5,13 @@ from datetime import datetime
 from time import sleep
 from flask_cors import CORS
 from models.Member import Member
+from models.CheckedBooks import CheckedBooks
+from models.InventoryView import InventoryView
 from models.SchemaMapping import Book as BookSchema
 from models.SchemaMapping import Bag as BagSchema
-from models.SchemaMapping import CheckedBooks as CheckedBooksSchema
-from models.CheckedBooks import CheckedBooks
+from models.SchemaMapping import CheckedBooks as CheckedBooksSchema 
+from models.SchemaMapping import Inventory as InventorySchema 
+from models.SchemaMapping import InventoryView as InventoryViewSchema
 
 import sqlite3
 import os 
@@ -105,6 +108,16 @@ def get_checked_books():
         checked_books.append(CheckedBooks(bag_item=bgitem , book_item=bkitem, member_item = memitem))
     schema = CheckedBooksSchema()
     result = schema.dump(checked_books,many=True) 
+    return jsonify({"booklist":result}) 
+
+@app.route('/getBooksInventory')
+def get_books_inventory(): 
+    inventory_list = DatabaseInstance.getInstance().get_books_inventory();   
+    inventory=[]
+    for in_item, bk_item in inventory_list:
+        inventory.append(InventoryView(inventory_item= in_item,book_item =bk_item))
+    schema = InventoryViewSchema()
+    result = schema.dump(inventory,many=True) 
     return jsonify({"booklist":result}) 
 
 

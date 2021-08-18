@@ -37,6 +37,10 @@ class DatabaseInstance:
         baglist = db_session.query(Bag,Book,Member).join(Book,Book.bookID==Bag.bookID).join(Member,Member.id==Bag.memberID).all()
         return baglist   
     
+    def get_books_inventory(self):
+        inventory = db_session.query(Inventory,Book).join(Book,Book.bookID==Inventory.bookID).all()
+        return inventory
+    
     def add_items_to_inventory(self,inventory_list ):  
         for item in inventory_list: 
             inventory = Inventory(**item) 
@@ -57,7 +61,7 @@ class DatabaseInstance:
         db_session.add(Member(user_id=user_id,psswd=psswd,first_name = f_name,last_name= l_name,dob= dob,join_date= joindate))
         db_session.commit()
         return ""
-        
+       
     def book_checkout(self,member_id,book_id,date):
         #check debt         
         inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first()
