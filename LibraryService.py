@@ -37,7 +37,14 @@ def hello():
 
 @app.route('/getApiBookList')
 def get_api_book_list():
-    json_arr = requests.get('https://frappe.io/api/method/frappe-library')
+    arg_string = ""
+    for key in request.args:
+        if  request.args[key] !="":
+            arg_string+='{}={}&&'.format(key, request.args[key]) 
+    print('https://frappe.io/api/method/frappe-library'+"?"+arg_string)
+    json_arr = requests.get('https://frappe.io/api/method/frappe-library'+"?"+arg_string)
+    if len(json_arr.json()["message"]) ==0 :
+        return jsonify([])
     book_list=pd.DataFrame(json_arr.json()["message"])
     book_list.rename(columns={'  num_pages': 'num_pages'},inplace =True) 
     book_list = book_list.assign(count=1)
