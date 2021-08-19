@@ -7,7 +7,7 @@ class Inventory(Base):
 	inventoryID = Column("in_id" ,  Integer, primary_key = True) 
 	bookID = Column("in_bookID" , Integer, ForeignKey('books.b_bookID')) 
 	count = Column("in_count" ,Integer)  
-	checkout_count = Column("in_checkout_count" ,Integer)  
+	checkout_count = Column("in_checkout_count" ,Integer,default=0)  
 	
 	def __repr__(self):
 		return f'<Inventory {self.inventoryID!r}>'

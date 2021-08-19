@@ -5,6 +5,7 @@ from datetime import datetime
 from time import sleep
 from flask_cors import CORS
 from models.Member import Member
+from models.Inventory import Inventory
 from models.CheckedBooks import CheckedBooks
 from models.InventoryView import InventoryView
 from models.SchemaMapping import Book as BookSchema
@@ -39,9 +40,11 @@ def get_api_book_list():
     json_arr = requests.get('https://frappe.io/api/method/frappe-library')
     book_list=pd.DataFrame(json_arr.json()["message"])
     book_list.rename(columns={'  num_pages': 'num_pages'},inplace =True) 
-    DatabaseInstance.getInstance().add_all_books(book_list.to_dict('records'))
-    book_list=book_list.assign(count=1) 
-    DatabaseInstance.getInstance().add_items_to_inventory(book_list.filter(['bookID', 'count']).to_dict('records'))
+    book_list = book_list.assign(count=1)
+    book_list = book_list.assign(inventory_count=0)
+    inventory_count_list = DatabaseInstance.getInstance().get_invetory_count(book_list['bookID'].tolist())  
+    for item in inventory_count_list:  
+        book_list.loc[book_list.bookID == str(item.bookID), 'inventory_count'] = item.count 
     return book_list.to_json(orient="records")
     
 @app.route('/getAllBooks')
@@ -50,11 +53,19 @@ def get_all_book_list():
     schema = BookSchema()
     result = BookSchema().dump(book_list, many=True) 
     return jsonify({"booklist":result})
-    
-@app.route('/addBooksToSystem')
+
+@app.route('/addBooksToSystem', methods=['POST'])
 def add_books_to_system():      
-    book_list= pd.DataFrame(json_arr.json()["book_list"]) 
-    return book_list.json()
+    book_to_import = request.json["import_book"]
+    inventory_count = book_to_import.pop('inventory_count', 0)
+    import_count = book_to_import.pop('import_count', 0)
+    book_to_import.pop('count', None)
+    if inventory_count ==0: 
+        DatabaseInstance.getInstance().add_book(book_to_import)
+        DatabaseInstance.getInstance().add_item_to_inventory({"bookID":book_to_import["bookID"],"count":import_count})
+    else :     
+        DatabaseInstance.getInstance().update_inventory_item(book_to_import["bookID"], int(inventory_count)+int(import_count))
+    return get_api_book_list()
     
 @app.route('/updateBookCount')
 def update_book_count(): 
@@ -148,7 +159,7 @@ def delete_member():
 def update_member_details():
     DatabaseInstance.getInstance().update_member_details(request.json["memberId"],request.json["memberDetails"]);
     return jsonify({"status":"success"})
-	
+    
 def hashPass(user_id,psswd):
     result = hashlib.md5((user_id+psswd).encode())
     return  result.hexdigest()

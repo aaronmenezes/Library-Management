@@ -35,12 +35,16 @@ class DatabaseInstance:
         return booklist    
     
     def get_checked_books(self):
-        baglist = db_session.query(Bag,Book,Member).join(Book,Book.bookID==Bag.bookID).join(Member,Member.id==Bag.memberID).all()
+        baglist = db_session.query(Bag,Book,Member).join(Book,Book.bookID==Bag.bookID).join(Member,Member.id==Bag.memberID).order_by(Bag.bagId.desc()).all()
         return baglist   
     
     def get_books_inventory(self):
         inventory = db_session.query(Inventory,Book).join(Book,Book.bookID==Inventory.bookID).all()
         return inventory
+    
+    def add_book(self,book_item):
+        db_session.add(Book(**book_item))
+        db_session.commit()
 
     def delete_book(self,bookid):
         Book.query.filter_by(bookID=bookid).delete()
@@ -60,12 +64,21 @@ class DatabaseInstance:
             db_session.add(inventory)
         db_session.commit()
         return []
+        
+    def add_item_to_inventory(self,inventory_item ):   
+        db_session.add(Inventory(**inventory_item) )
+        db_session.commit()
+        return []
     
     def update_inventory_item(self,book_id,count):
         db_session.query(Inventory).filter(Inventory.bookID == book_id).update({'count':count})
         db_session.commit()
         return []
     
+    def get_invetory_count(self,book_list):
+        inventory_count_list = db_session.query(Inventory).filter(Inventory.bookID.in_(book_list)).all() 
+        return inventory_count_list;
+        
     def get_member(self,userid):
         member = db_session.query(Member).filter_by(user_id=userid).first()
         return member
