@@ -92,9 +92,9 @@ def sign_in():
 
 @app.route('/signup' , methods=['POST'])
 def sign_up():
-    user_id = request.json['userId']
+    user_id = request.json['user_id']
     psswd = hashPass(user_id,request.json['psswd'])  
-    DatabaseInstance.getInstance().add_member(user_id,psswd,request.json['fName'],request.json['lName'],request.json['dob'],datetime.today().strftime('%d-%m-%Y'));
+    DatabaseInstance.getInstance().add_member(user_id,psswd,request.json['first_name'],request.json['last_name'],request.json['dob'],datetime.today().strftime('%d-%m-%Y'));
     return jsonify({"status":"success"})
 
 @app.route('/checkout' , methods=['POST'])
