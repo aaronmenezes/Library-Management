@@ -137,7 +137,17 @@ def get_member_list():
     print(member_list)
     schema = MemberSchema(exclude={"psswd"})
     result = schema.dump(member_list,many=True) 
-    return jsonify({"memberlist":result}) 
+    return jsonify({"memberlist":result})
+
+@app.route('/deleteMember')
+def delete_member(): 
+    DatabaseInstance.getInstance().delete_member(request.args["memberId"])
+    return jsonify({"status":"success"})
+
+@app.route('/updateMemberDetails', methods=['POST'])
+def update_member_details():
+    DatabaseInstance.getInstance().update_member_details(request.json["memberId"],request.json["memberDetails"]);
+    return jsonify({"status":"success"})
 	
 def hashPass(user_id,psswd):
     result = hashlib.md5((user_id+psswd).encode())

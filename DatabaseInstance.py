@@ -79,6 +79,17 @@ class DatabaseInstance:
         member_list = db_session.query(Member).filter(Member.role == "member").all() 
         return member_list        
     
+    def update_member_details(self,memberid,member_vals):
+        db_session.query(Member).filter(Member.id == memberid).update(member_vals)
+        db_session.commit() 
+        return []
+
+    def delete_member(self,memberid):
+        Member.query.filter_by(id=memberid).delete() 
+        Bag.query.filter_by(memberID=memberid).delete()
+        db_session.commit()
+        return []
+
     def book_checkout(self,member_id,book_id,date,amount):
         #check debt         
         inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first() 
