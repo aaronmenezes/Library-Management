@@ -125,8 +125,9 @@ def checkout():
 @app.route('/checkin' , methods=['POST'])
 def checkin():
     user_id = request.json['userId']
-    book_id = request.json['bookId']  
-    DatabaseInstance.getInstance().book_checkin(user_id,book_id,datetime.today().strftime('%d-%m-%Y'),100);
+    book_id = request.json['bookId'] 
+    bagId = request.json['bagId'] 
+    DatabaseInstance.getInstance().book_checkin(user_id,book_id,bagId,datetime.today().strftime('%d-%m-%Y'),100);
     return jsonify({"status":"success"})
 
 @app.route('/getCheckedBooks')

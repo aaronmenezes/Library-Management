@@ -118,14 +118,14 @@ class DatabaseInstance:
         else :
             return {"status":"fail","msg":"Insufficient stock"}
 
-    def book_checkin(self,member_id,book_id,date,amount):
+    def book_checkin(self,member_id,book_id,bagId,date,amount):
         inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first() 
         member = db_session.query(Member).filter_by(id=member_id).first()     
         if member.debt >100:
             member.debt = member.debt - amount;
             db_session.add(Transactions(m_id=member_id,book = book_id,amount=amount,date= date))            
         inventory_item.checkout_count = inventory_item.checkout_count-1
-        db_session.query(Bag).filter(Bag.memberID == member_id , Bag.bookID == book_id ).update({'checkin_date':date,'status':0}) 
+        db_session.query(Bag).filter(Bag.memberID == member_id , Bag.bookID == book_id,Bag.bagId==bagId ).update({'checkin_date':date,'status':0}) 
         db_session.commit()
         return []
         
