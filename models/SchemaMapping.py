@@ -31,7 +31,8 @@ class Member(Schema):
     dob = fields.Str()
     join_date = fields.Str()
     role = fields.Str()
-    
+    debt = fields.Int()
+	
 class Bag(Schema): 
     bagId = fields.Int()
     bookID = fields.Int()

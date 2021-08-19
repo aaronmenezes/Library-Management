@@ -95,20 +95,20 @@ def sign_up():
     user_id = request.json['userId']
     psswd = hashPass(user_id,request.json['psswd'])  
     DatabaseInstance.getInstance().add_member(user_id,psswd,request.json['fName'],request.json['lName'],request.json['dob'],datetime.today().strftime('%d-%m-%Y'));
-    return ""
+    return jsonify({"status":"success"})
 
 @app.route('/checkout' , methods=['POST'])
 def checkout():
     user_id = request.json['userId']
     book_id = request.json['bookId'] 
-    DatabaseInstance.getInstance().book_checkout(user_id,book_id,datetime.today().strftime('%d-%m-%Y'));
-    return ""
+    result = DatabaseInstance.getInstance().book_checkout(user_id,book_id,datetime.today().strftime('%d-%m-%Y'),100);
+    return jsonify(result)
 
 @app.route('/checkin' , methods=['POST'])
 def checkin():
     user_id = request.json['userId']
     book_id = request.json['bookId']  
-    DatabaseInstance.getInstance().book_checkin(user_id,book_id,datetime.today().strftime('%d-%m-%Y'));
+    DatabaseInstance.getInstance().book_checkin(user_id,book_id,datetime.today().strftime('%d-%m-%Y'),100);
     return jsonify({"status":"success"})
 
 @app.route('/getCheckedBooks')
@@ -145,7 +145,6 @@ def hashPass(user_id,psswd):
 
 def check_password(user_id,raw_password, enc_password):    
     return enc_password == hashPass(user_id,raw_password)
-
     
 @app.teardown_appcontext
 def shutdown_session(exception=None):

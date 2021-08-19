@@ -1,14 +1,14 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String,ForeignKey
 from DatabaseInstance import Base
 
 class Transactions(Base): 
 	__tablename__  =  'transactions'
 	
 	t_id = Column("t_id", Integer, primary_key = True)
-	m_id = Column("m_id", INTEGER,  ForeignKey('member.id') )
-	book = Column("t_book",   ForeignKey('book.bookID') )
-	amount = Column("t_amount", INTEGER)
+	m_id = Column("m_id", Integer, ForeignKey('members.m_id'))
+	book = Column("t_book",Integer, ForeignKey('books.b_bookID') )
+	amount = Column("t_amount", Integer)
 	date = Column("t_date", String(100)) 
 	
 	

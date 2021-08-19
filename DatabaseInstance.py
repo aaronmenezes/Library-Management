@@ -3,7 +3,8 @@ from models.Book import Book
 from models.Inventory import Inventory
 from models.Member import Member
 from models.Bag import Bag
- 
+from models.Transactions import Transactions
+
 class DatabaseInstance:
     __instance = None 
     
@@ -76,20 +77,29 @@ class DatabaseInstance:
         
     def get_member_list(self):
         member_list = db_session.query(Member).filter(Member.role == "member").all() 
-        return member_list		
+        return member_list        
     
-    def book_checkout(self,member_id,book_id,date):
+    def book_checkout(self,member_id,book_id,date,amount):
         #check debt         
-        inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first()
-        print(inventory_item.checkout_count < inventory_item.count)
+        inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first() 
+        member = db_session.query(Member).filter_by(id=member_id).first() 
+        if member.debt >=500:
+            return {"status":"fail","msg":"Memebr Debt 500"}
         if inventory_item.checkout_count < inventory_item.count:
             inventory_item.checkout_count = inventory_item.checkout_count+1
             db_session.add(Bag(bookID = book_id,memberID=member_id,status = 1,checkout_date=date))
+            member.debt = member.debt +amount;
             db_session.commit()
-        return []
+            return {"status":"success"}
+        else :
+            return {"status":"fail","msg":"Insufficient stock"}
 
-    def book_checkin(self,member_id,book_id,date):
-        inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first()  
+    def book_checkin(self,member_id,book_id,date,amount):
+        inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first() 
+        member = db_session.query(Member).filter_by(id=member_id).first()     
+        if member.debt >100:
+            member.debt = member.debt - amount;
+            db_session.add(Transactions(m_id=member_id,book = book_id,amount=amount,date= date))            
         inventory_item.checkout_count = inventory_item.checkout_count-1
         db_session.query(Bag).filter(Bag.memberID == member_id , Bag.bookID == book_id ).update({'checkin_date':date,'status':0}) 
         db_session.commit()
