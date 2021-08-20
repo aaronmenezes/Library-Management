@@ -17,9 +17,7 @@ from models.SchemaMapping import CheckedBooks as CheckedBooksSchema
 from models.SchemaMapping import Inventory as InventorySchema 
 from models.SchemaMapping import InventoryView as InventoryViewSchema
 from models.SchemaMapping import MemberRankingView as MemberRankingViewSchema
-from models.SchemaMapping import BookRanking as BookRankingViewSchema
-
-import sqlite3
+from models.SchemaMapping import BookRanking as BookRankingViewSchema 
 import os 
 import pandas as pd 
 import requests    
@@ -99,15 +97,15 @@ def sign_in():
     user_id = request.json['userId']
     psswd = request.json['psswd']
     member_details = DatabaseInstance.getInstance().get_member(user_id);
-    if isinstance(member_details,Member) and check_password(user_id,psswd,member_details.psswd):      
+    
+    if isinstance(member_details,Member) and check_password(user_id,psswd,member_details.psswd):  
+        schema =MemberSchema(exclude={"psswd"})
+        result = schema.dump(member_details)     
         return jsonify(
         {
         "login":"success", 
-        "user_id":member_details.user_id,
-        "fName":member_details.first_name,
-        "lName":member_details.last_name,
-        "dob":member_details.dob,
-        "join_date":member_details.join_date }
+        "user_details":result
+        }
         )
     else:
         return jsonify( { "login":"fail"})
