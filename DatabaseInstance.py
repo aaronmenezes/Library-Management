@@ -4,6 +4,7 @@ from models.Inventory import Inventory
 from models.Member import Member
 from models.Bag import Bag
 from models.Transactions import Transactions
+from sqlalchemy import func
 
 class DatabaseInstance:
     __instance = None 
@@ -103,8 +104,7 @@ class DatabaseInstance:
         db_session.commit()
         return []
 
-    def book_checkout(self,member_id,book_id,date,amount):
-        #check debt         
+    def book_checkout(self,member_id,book_id,date,amount): 
         inventory_item = db_session.query(Inventory).filter_by(bookID=int(book_id)).first() 
         member = db_session.query(Member).filter_by(id=member_id).first() 
         if member.debt >=500:
@@ -128,7 +128,19 @@ class DatabaseInstance:
         db_session.query(Bag).filter(Bag.memberID == member_id , Bag.bookID == book_id,Bag.bagId==bagId ).update({'checkin_date':date,'status':0}) 
         db_session.commit()
         return []
-        
+
+    def get_top_books(self): 
+        result = db_session.query(func.count(Bag.bookID).label("rank_count"),Book).group_by(Bag.bookID).join(Book,Book.bookID==Bag.bookID).all()
+        return result
+
+    def get_top_spenders(self): 
+        result = db_session.query(func.sum(Transactions.amount).label("spend_amount"),Member).group_by(Member.id).join(Member,Member.id==Transactions.m_id).all() 
+        return result
+		
+    def get_all_transactions(self): 	
+        transactions = db_session.query(Transactions,Member).join(Member,Member.id==Transactions.m_id).all() 
+        return transactions
+
     def remove(self):
         shutdown_session()
 '''

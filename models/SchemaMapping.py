@@ -41,6 +41,13 @@ class Bag(Schema):
     checkout_date = fields.Str() 
     checkin_date = fields.Str() 
     
+class Transactions(Schema): 
+    t_id = fields.Int()
+    m_id = fields.Int()
+    book = fields.Int()
+    amount = fields.Int()
+    date = fields.Str()  
+	
 class CheckedBooks(Schema): 
     bag_item = fields.Nested(Bag)
     book_item = fields.Nested(Book)
@@ -48,4 +55,12 @@ class CheckedBooks(Schema):
 
 class InventoryView(Schema): 
     inventory_item = fields.Nested(Inventory)
+    book_item = fields.Nested(Book)
+
+class MemberRankingView(Schema): 
+    item_count = fields.Int()
+    member_item = fields.Nested(Member,exclude={"psswd"})
+	
+class BookRanking(Schema): 
+    item_count = fields.Int()
     book_item = fields.Nested(Book)

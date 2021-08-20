@@ -13,4 +13,4 @@ class Transactions(Base):
 	
 	
 	def __repr__(self):
-		return f'<Transactions {self.bookID!r}>'
+		return f'<Transactions {self.t_id!r}>'

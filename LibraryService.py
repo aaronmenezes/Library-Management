@@ -6,14 +6,18 @@ from time import sleep
 from flask_cors import CORS
 from models.Member import Member
 from models.Inventory import Inventory
+from models.TransactionView import TransactionView
 from models.CheckedBooks import CheckedBooks
 from models.InventoryView import InventoryView
+from models.BookRankingView import BookRankingView
 from models.SchemaMapping import Book as BookSchema
 from models.SchemaMapping import Bag as BagSchema
 from models.SchemaMapping import Member as MemberSchema
 from models.SchemaMapping import CheckedBooks as CheckedBooksSchema 
 from models.SchemaMapping import Inventory as InventorySchema 
 from models.SchemaMapping import InventoryView as InventoryViewSchema
+from models.SchemaMapping import MemberRankingView as MemberRankingViewSchema
+from models.SchemaMapping import BookRanking as BookRankingViewSchema
 
 import sqlite3
 import os 
@@ -72,7 +76,7 @@ def add_books_to_system():
         DatabaseInstance.getInstance().add_item_to_inventory({"bookID":book_to_import["bookID"],"count":import_count})
     else :     
         DatabaseInstance.getInstance().update_inventory_item(book_to_import["bookID"], int(inventory_count)+int(import_count))
-    return get_api_book_list()
+    return jsonify({"status":"success"})
     
 @app.route('/updateBookCount')
 def update_book_count(): 
@@ -152,8 +156,7 @@ def get_books_inventory():
 
 @app.route('/getMemberList')
 def get_member_list():
-    member_list = DatabaseInstance.getInstance().get_member_list();
-    print(member_list)
+    member_list = DatabaseInstance.getInstance().get_member_list(); 
     schema = MemberSchema(exclude={"psswd"})
     result = schema.dump(member_list,many=True) 
     return jsonify({"memberlist":result})
@@ -167,7 +170,28 @@ def delete_member():
 def update_member_details():
     DatabaseInstance.getInstance().update_member_details(request.json["memberId"],request.json["memberDetails"]);
     return get_member_list()
+
+@app.route('/getCustomerRanking')
+def get_customer_ranking():
     
+    transactions = DatabaseInstance.getInstance().get_top_spenders();  
+    tmpView=[]
+    for spend_amount, mb_item in transactions:
+        tmpView.append(TransactionView(item_count= spend_amount,member_item = mb_item))
+    schema = MemberRankingViewSchema()
+    transactionView = schema.dump(tmpView,many=True)
+    return jsonify({"rank_list":transactionView})	 
+
+@app.route('/getTopBooks')
+def get_top_books():
+    result = DatabaseInstance.getInstance().get_top_books()
+    tmp_view = [] 
+    for rank_count,bk_item in result: 
+        tmp_view.append(BookRankingView(item_count = rank_count, book_item=bk_item))
+    schema = BookRankingViewSchema()
+    result_view = schema.dump(tmp_view,many=True)  
+    return jsonify({"rank_list":result_view})
+
 def hashPass(user_id,psswd):
     result = hashlib.md5((user_id+psswd).encode())
     return  result.hexdigest()
