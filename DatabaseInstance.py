@@ -130,7 +130,7 @@ class DatabaseInstance:
         return []
 
     def get_top_books(self): 
-        result = db_session.query(func.count(Bag.bookID).label("rank_count"),Book).group_by(Bag.bookID).join(Book,Book.bookID==Bag.bookID).all()
+        result = db_session.query(func.count(Bag.bookID).label("rank_count"),Book,Inventory.count,Inventory.checkout_count).group_by(Bag.bookID).join(Book,Book.bookID==Bag.bookID).join(Inventory,Inventory.bookID==Bag.bookID).all()
         return result
 
     def get_top_spenders(self): 

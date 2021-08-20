@@ -63,4 +63,6 @@ class MemberRankingView(Schema):
 	
 class BookRanking(Schema): 
     item_count = fields.Int()
+    inventory_count = fields.Int()
+    checkout_count = fields.Int()
     book_item = fields.Nested(Book)

@@ -186,8 +186,8 @@ def get_customer_ranking():
 def get_top_books():
     result = DatabaseInstance.getInstance().get_top_books()
     tmp_view = [] 
-    for rank_count,bk_item in result: 
-        tmp_view.append(BookRankingView(item_count = rank_count, book_item=bk_item))
+    for rank_count,bk_item, in_count, chk_count in result: 
+        tmp_view.append(BookRankingView(item_count = rank_count,inventory_count= in_count,checkout_count=chk_count, book_item=bk_item))
     schema = BookRankingViewSchema()
     result_view = schema.dump(tmp_view,many=True)  
     return jsonify({"rank_list":result_view})
