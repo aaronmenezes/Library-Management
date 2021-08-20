@@ -113,7 +113,7 @@ def sign_up():
     user_id = request.json['user_id']
     psswd = hashPass(user_id,request.json['psswd'])  
     DatabaseInstance.getInstance().add_member(user_id,psswd,request.json['first_name'],request.json['last_name'],request.json['dob'],datetime.today().strftime('%d-%m-%Y'));
-    return jsonify({"status":"success"})
+    return get_member_list()
 
 @app.route('/checkout' , methods=['POST'])
 def checkout():
@@ -161,12 +161,12 @@ def get_member_list():
 @app.route('/deleteMember')
 def delete_member(): 
     DatabaseInstance.getInstance().delete_member(request.args["memberId"])
-    return jsonify({"status":"success"})
+    return get_member_list()
 
 @app.route('/updateMemberDetails', methods=['POST'])
 def update_member_details():
     DatabaseInstance.getInstance().update_member_details(request.json["memberId"],request.json["memberDetails"]);
-    return jsonify({"status":"success"})
+    return get_member_list()
     
 def hashPass(user_id,psswd):
     result = hashlib.md5((user_id+psswd).encode())
