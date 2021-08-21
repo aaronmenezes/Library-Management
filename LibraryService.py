@@ -63,6 +63,19 @@ def get_all_book_list():
     result = BookSchema().dump(book_list, many=True) 
     return jsonify({"booklist":result})
 
+    
+@app.route('/quickBookSearch')
+def quick_book_search():  
+    book_param = request.args["book_q"]
+    author_param = request.args["auth_q"] 
+    book_list = DatabaseInstance.getInstance().search_books(book_param,author_param) 
+    inventory=[]
+    for in_item, bk_item in book_list:
+        inventory.append(InventoryView(inventory_item= in_item,book_item =bk_item))
+    schema = InventoryViewSchema()
+    result = schema.dump(inventory,many=True) 
+    return jsonify({"booklist":result})
+
 @app.route('/addBooksToSystem', methods=['POST'])
 def add_books_to_system():      
     book_to_import = request.json["import_book"]
