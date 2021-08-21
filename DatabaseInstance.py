@@ -46,7 +46,7 @@ class DatabaseInstance:
     def search_books(self,book_param,author_param):
         book_srch = "%{}%".format(book_param)
         auth_srch = "%{}%".format(author_param)
-        inventory = db_session.query(Inventory,Book).join(Book,Book.bookID==Inventory.bookID).filter(Book.title.like(book_srch)).all()
+        inventory = db_session.query(Inventory,Book).join(Book,Book.bookID==Inventory.bookID).filter(Book.title.like(book_srch),Book.authors.like(auth_srch)).all()
         #.filter(Book.authors.like(auth_srch))
         return inventory
     
