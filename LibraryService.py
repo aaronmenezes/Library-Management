@@ -183,15 +183,14 @@ def update_member_details():
     return get_member_list()
 
 @app.route('/getCustomerRanking')
-def get_customer_ranking():
-    
+def get_customer_ranking():    
     transactions = DatabaseInstance.getInstance().get_top_spenders();  
     tmpView=[]
     for spend_amount, mb_item in transactions:
         tmpView.append(TransactionView(item_count= spend_amount,member_item = mb_item))
     schema = MemberRankingViewSchema()
     transactionView = schema.dump(tmpView,many=True)
-    return jsonify({"rank_list":transactionView})	 
+    return jsonify({"rank_list":transactionView})     
 
 @app.route('/getTopBooks')
 def get_top_books():
@@ -202,6 +201,44 @@ def get_top_books():
     schema = BookRankingViewSchema()
     result_view = schema.dump(tmp_view,many=True)  
     return jsonify({"rank_list":result_view})
+
+@app.route('/getTopBooksReport')
+def get_top_books_report():
+    result = DatabaseInstance.getInstance().get_top_books() 
+    data_list = [to_dict(item) for item in result]
+    data_list  =reversed(data_list) 
+    df = pd.DataFrame(data_list)
+    filename = "assets/TopBooksReport.xlsx"
+    writer = pd.ExcelWriter(filename)
+    df.to_excel(writer, sheet_name='TopBooksReport')
+    writer.save()
+    return send_from_directory(directory='assets',filename= 'TopBooksReport.xlsx', as_attachment=True)
+
+@app.route('/getCustomerRankingReport')
+def get_top_spender_report():
+    result = DatabaseInstance.getInstance().get_top_spenders() 
+    data_list = [to_dict(item) for item in result]
+    df = pd.DataFrame(data_list)
+    filename = "assets/TopSpenderReport.xlsx"
+    writer = pd.ExcelWriter(filename)
+    df.to_excel(writer, sheet_name='TopSpenderReport')
+    writer.save()
+    return send_from_directory(directory='assets',filename= 'TopSpenderReport.xlsx', as_attachment=True)
+    
+def to_dict(row):
+    print(row.keys()) 
+    if row is None:
+        return None
+    rtn_dict = dict()     
+    keys =[a for a in dir( row[1]) if not (a.startswith('_') or a =='metadata' or a=='query')]
+    print(keys)
+    for ikeys in row:
+        if row.index(ikeys) !=1:
+            rtn_dict[row.keys()[row.index(ikeys)]] =ikeys
+        for key in keys:
+            rtn_dict[key] = getattr(row[1], key)
+    return rtn_dict
+    
 
 def hashPass(user_id,psswd):
     result = hashlib.md5((user_id+psswd).encode())
@@ -216,4 +253,4 @@ def shutdown_session(exception=None):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port,debug=True) 
+    app.run(host='0.0.0.0', port=port,debug=False) 
