@@ -26,12 +26,6 @@ import hashlib
 app = Flask(__name__)   
 CORS(app)
 
-"""   
-https://stream-canvas-va1.herokuapp.com/ | https://git.heroku.com/stream-canvas-va1.git
-"""
-ALLOWED_EXTENSIONS = set([ 'png', 'jpg', 'jpeg'])
-
-
 @app.route("/test")
 def hello():
     DatabaseInstance.getInstance().testDb()
@@ -62,7 +56,6 @@ def get_all_book_list():
     schema = BookSchema()
     result = BookSchema().dump(book_list, many=True) 
     return jsonify({"booklist":result})
-
     
 @app.route('/quickBookSearch')
 def quick_book_search():  
