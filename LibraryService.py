@@ -199,11 +199,22 @@ def get_top_books():
 def get_top_books_report():
     result = DatabaseInstance.getInstance().get_top_books() 
     data_list = [to_dict(item) for item in result]
-    data_list  =reversed(data_list) 
+    data_list  = reversed(data_list) 
     df = pd.DataFrame(data_list)
     filename = "assets/TopBooksReport.xlsx"
+    sheet_name = 'TopBooksReport'
     writer = pd.ExcelWriter(filename)
-    df.to_excel(writer, sheet_name='TopBooksReport')
+    df.to_excel(writer, sheet_name=sheet_name) 
+    workbook = writer.book
+    worksheet = writer.sheets[sheet_name] 
+    chart = workbook.add_chart({'type': 'column'})
+    chart.add_series({ 
+        'values':     [sheet_name, 1, 1, len(df.index), 1], 
+        'gap':        2,
+    }) 
+    chart.set_legend({'position': 'top'}) 
+    chart.set_y_axis({'major_gridlines': {'visible': True}})   
+    worksheet.insert_chart('R2', chart) 
     writer.save()
     return send_from_directory(directory='assets',filename= 'TopBooksReport.xlsx', as_attachment=True)
 
@@ -211,20 +222,30 @@ def get_top_books_report():
 def get_top_spender_report():
     result = DatabaseInstance.getInstance().get_top_spenders() 
     data_list = [to_dict(item) for item in result]
+    data_list  = reversed(data_list) 
     df = pd.DataFrame(data_list)
     filename = "assets/TopSpenderReport.xlsx"
+    sheet_name = 'TopSpenderReport'
     writer = pd.ExcelWriter(filename)
-    df.to_excel(writer, sheet_name='TopSpenderReport')
-    writer.save()
+    df.to_excel(writer, sheet_name=sheet_name)
+    workbook = writer.book
+    worksheet = writer.sheets[sheet_name] 
+    chart = workbook.add_chart({'type': 'column'})
+    chart.add_series({	
+        'values':     [sheet_name, 1, 1, len(df.index), 1], 
+        'gap':        2,
+    }) 
+    chart.set_legend({'position': 'top'}) 
+    chart.set_y_axis({'major_gridlines': {'visible': True}})   
+    worksheet.insert_chart('R2', chart) 
+    writer.save() 
     return send_from_directory(directory='assets',filename= 'TopSpenderReport.xlsx', as_attachment=True)
     
-def to_dict(row):
-    print(row.keys()) 
+def to_dict(row): 
     if row is None:
         return None
     rtn_dict = dict()     
-    keys =[a for a in dir( row[1]) if not (a.startswith('_') or a =='metadata' or a=='query')]
-    print(keys)
+    keys =[a for a in dir( row[1]) if not (a.startswith('_') or a =='metadata' or a=='query')] 
     for ikeys in row:
         if row.index(ikeys) !=1:
             rtn_dict[row.keys()[row.index(ikeys)]] =ikeys
